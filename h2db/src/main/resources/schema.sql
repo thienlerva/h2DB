@@ -1,6 +1,6 @@
 SET MODE Oracle;
 
-create table STUDENT (
-    id int not null PRIMARY KEY,
-    name varchar2(50)
+create table STUDENTS (
+    student_id int AUTO_INCREMENT PRIMARY KEY,
+    student_name varchar2(50)
 );

@@ -1,4 +1,6 @@
-server.port: 9090
+server:
+  port: 9090
+
 spring:
   application:
     name: h2-DB
@@ -15,4 +17,4 @@ spring:
   jpa:
     show-sql: true
     hibernate:
-      ddl-auto: create
+      ddl-auto: update

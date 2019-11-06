@@ -5,23 +5,21 @@ import lombok.*;
 import javax.persistence.*;
 import java.io.Serializable;
 
-@NoArgsConstructor
-@Getter
-@Setter
-@AllArgsConstructor
+@Data
 @Entity
-@Table
+@Table(name="STUDENTS")
 public class Student {
 
 
 
-    @Id
-    @Column
+
 //    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "STUDENT_ID_SEQUENCE")
 //    @SequenceGenerator(name = "STUDENT_ID_SEQUENCE", sequenceName = "STUDENT_ID_SEQUENCE")
+    @Id
+    @Column(name="student_id")
     int id;
 
-    @Column
+    @Column(name="student_name")
     String name;
 
 

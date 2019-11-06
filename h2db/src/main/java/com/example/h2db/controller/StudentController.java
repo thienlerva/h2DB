@@ -23,32 +23,32 @@ public class StudentController {
     @Autowired
     RestService restService;
 
-    @Autowired
-    RestTemplate restTemplate;
+//    @Autowired
+//    RestTemplate restTemplate;
 
     @GetMapping(value = "/all")
     public List<Student> getAll() {
         return repo.findAll();
     }
 
-    @GetMapping("/api")
-    public ResponseEntity<Student> findAll() {
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
+//    @GetMapping("/api")
+//    public ResponseEntity<Student> findAll() {
+//        HttpHeaders headers = new HttpHeaders();
+//        headers.setContentType(MediaType.APPLICATION_JSON);
+//
+//
+//        return restTemplate.exchange("localhost:8080/student/all", HttpMethod.GET, new HttpEntity<>(headers), Student.class);
+//    }
 
-
-        return restTemplate.exchange("localhost:8080/student/all", HttpMethod.GET, new HttpEntity<>(headers), Student.class);
-    }
-
-    @GetMapping("/api/all")
-    public Student getAllApi() {
-        return restService.findAll();
-    }
+//    @GetMapping("/api/all")
+//    public Student getAllApi() {
+//        return restService.findAll();
+//    }
 
     @GetMapping("/create")
     public ResponseEntity<Student> create() {
 
-        Student student1 = new Student(4, "Anthony");
+        Student student1 = new Student();
         student1 = repo.save(student1);
 
         if(student1==null) {

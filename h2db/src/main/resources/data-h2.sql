@@ -1,2 +1,1 @@
-INSERT INTO STUDENT VALUES (1, 'Jennifer');
-INSERT INTO STUDENT VALUES (2, 'Anthony');
+INSERT INTO STUDENTS (student_name) VALUES ( 'Jennifer'), ('Anthony');
