@@ -1,18 +1,18 @@
 package com.example.h2db.controller;
 
+import com.example.h2db.model.Course;
 import com.example.h2db.model.Student;
+import com.example.h2db.repository.CourseRepository;
 import com.example.h2db.repository.StudentRepository;
-import com.example.h2db.service.RestService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.web.client.RestTemplateBuilder;
 import org.springframework.http.*;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @RestController
 public class StudentController {
@@ -21,40 +21,58 @@ public class StudentController {
     StudentRepository repo;
 
     @Autowired
-    RestService restService;
+    CourseRepository courseRepository;
 
-//    @Autowired
-//    RestTemplate restTemplate;
+    @Autowired
+    RestTemplate restTemplate;
+
+
 
     @GetMapping(value = "/all")
-    public List<Student> getAll() {
-        return repo.findAll();
+    public Map<String, List<Student>> getAll() {
+
+        List<Student> students = repo.findAll();
+        Map<String, List<Student>> stringListMap = new HashMap<>();
+        stringListMap.put("students", students);
+        return stringListMap;
     }
 
-//    @GetMapping("/api")
-//    public ResponseEntity<Student> findAll() {
-//        HttpHeaders headers = new HttpHeaders();
-//        headers.setContentType(MediaType.APPLICATION_JSON);
-//
-//
-//        return restTemplate.exchange("localhost:8080/student/all", HttpMethod.GET, new HttpEntity<>(headers), Student.class);
-//    }
+    @GetMapping(value = "/findStudentId")
+    public Map<String, List<Course>> findStudentId() {
+
+        Optional<Student> student = repo.findById(1);
+        Student opt = student.get();
+        List<Course> courses = courseRepository.findAll();
+        Map<String, List<Course>> studentMap = new HashMap<>();
+        studentMap.put(opt.getName(), courses);
+        return studentMap;
+    }
+
+    @GetMapping("/api")
+    public ResponseEntity<Student> findAll() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        ResponseEntity<Student> response = restTemplate.exchange("localhost:8080/student/all", HttpMethod.GET, new HttpEntity<>(headers), Student.class);
+
+        return response;
+    }
 
 //    @GetMapping("/api/all")
 //    public Student getAllApi() {
 //        return restService.findAll();
 //    }
 
-    @GetMapping("/create")
-    public ResponseEntity<Student> create() {
+    @PostMapping("/create")
+    public ResponseEntity<String> createStudents(@RequestBody Map<String, List<Student>> studentMap) {
 
-        Student student1 = new Student();
-        student1 = repo.save(student1);
+        List<Student> students = studentMap.get("students");
+        List<Student> response = repo.saveAll(students);
 
-        if(student1==null) {
-            return new ResponseEntity<Student>(HttpStatus.CONFLICT);
+        if(response==null) {
+            return new ResponseEntity<>("Unable to create", HttpStatus.CONFLICT);
         } else {
-            return new ResponseEntity<Student>(student1, HttpStatus.CREATED);
+            return new ResponseEntity<>("success", HttpStatus.CREATED);
         }
     }
 
