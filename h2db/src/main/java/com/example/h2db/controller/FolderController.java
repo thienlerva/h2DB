@@ -1,0 +1,70 @@
+package com.example.h2db.controller;
+
+import com.example.h2db.model.Path;
+import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.*;
+
+import java.io.File;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+@RestController
+@RequestMapping("/folder")
+@CrossOrigin("*")
+public class FolderController {
+
+    @Value("${path.name}")
+    private String name;
+
+    @GetMapping("/")
+    public List<Path> getAll() {
+
+        File[] directories = new File(this.name).listFiles(File::isDirectory);
+
+        List<File> files = Arrays.asList(directories);
+        List<Path> fileList = new ArrayList<>();
+        for(File f : files) {
+            Path path = new Path();
+            path.setName(f.getAbsolutePath());
+            fileList.add(path);
+        }
+        System.out.println(files);
+        return fileList;
+    }
+
+    @PostMapping("/createDir")
+    public ResponseEntity<String> createPath(@RequestBody Path path) {
+        System.out.println(path.getName());
+        File[] directories = new File(path.getName()).listFiles(File::isDirectory);
+        if (directories!=null) {
+            this.name = path.getName();
+            return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
+        } else {
+            return new ResponseEntity<>("unable to process", HttpStatus.BAD_REQUEST);
+        }
+    }
+
+    @GetMapping("/all")
+    public List<String> getFolder() {
+        System.out.println("Running----------------");
+        return Arrays.asList("Shapefile", "GeoTIFF");
+    }
+
+    @GetMapping("/one")
+    public String getONeFolder() {
+        return "Shapefile";
+    }
+
+    @PostMapping("/create")
+    public ResponseEntity<List<String>> createFolder(@RequestBody List<String> folders) {
+        System.out.println("Running program------------");
+        if (folders!=null) {
+            return new ResponseEntity<>(folders, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<>(Arrays.asList("Unable to create"), HttpStatus.BAD_REQUEST);
+        }
+    }
+}

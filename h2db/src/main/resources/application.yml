@@ -1,6 +1,8 @@
 #server:
 #  port: 9090
 
+path.name: /usr
+
 spring:
   application:
     name: h2-DB

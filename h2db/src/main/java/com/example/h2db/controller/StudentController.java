@@ -15,6 +15,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @RestController
+@CrossOrigin("*")
 public class StudentController {
 
     @Autowired
@@ -26,7 +27,10 @@ public class StudentController {
     @Autowired
     RestTemplate restTemplate;
 
-
+    @GetMapping("/students")
+    public List<Student> findAllStudent() {
+        return repo.findAll();
+        }
 
     @GetMapping(value = "/all")
     public Map<String, List<Student>> getAll() {
