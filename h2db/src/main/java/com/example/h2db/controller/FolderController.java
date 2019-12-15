@@ -1,8 +1,13 @@
 package com.example.h2db.controller;
 
 import com.example.h2db.model.Path;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -19,6 +24,9 @@ public class FolderController {
     @Value("${path.name}")
     private String name;
 
+    @Autowired
+    ObjectMapper objectMapper;
+
     @GetMapping("/")
     public List<Path> getAll() {
 
@@ -28,19 +36,38 @@ public class FolderController {
         List<Path> fileList = new ArrayList<>();
         for(File f : files) {
             Path path = new Path();
-            path.setName(f.getAbsolutePath());
+            path.setUrl(f.getAbsolutePath());
             fileList.add(path);
         }
         System.out.println(files);
         return fileList;
     }
 
+    @GetMapping("/map")
+    ResponseEntity<String> getAllOM() throws JsonProcessingException {
+        File[] directories = new File(this.name).listFiles(File::isDirectory);
+
+        List<File> files = Arrays.asList(directories);
+        List<Path> fileList = new ArrayList<>();
+        for(File f : files) {
+            Path path = new Path();
+            path.setUrl(f.getAbsolutePath());
+            fileList.add(path);
+        }
+        System.out.println("object mapper: " + files);
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+
+        return new ResponseEntity<>(objectMapper.writeValueAsString(fileList), headers,  HttpStatus.OK);
+    }
+
     @PostMapping("/createDir")
     public ResponseEntity<String> createPath(@RequestBody Path path) {
-        System.out.println(path.getName());
-        File[] directories = new File(path.getName()).listFiles(File::isDirectory);
+        System.out.println(path.getUrl());
+        File[] directories = new File(path.getUrl()).listFiles(File::isDirectory);
         if (directories!=null) {
-            this.name = path.getName();
+            this.name = path.getUrl();
             return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
         } else {
             return new ResponseEntity<>("unable to process", HttpStatus.BAD_REQUEST);

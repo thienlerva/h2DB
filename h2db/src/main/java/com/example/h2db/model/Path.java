@@ -11,4 +11,5 @@ import lombok.Setter;
 @NoArgsConstructor
 public class Path {
     String name;
+    String url;
 }
