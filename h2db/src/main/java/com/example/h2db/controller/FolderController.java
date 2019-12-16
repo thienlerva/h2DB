@@ -12,6 +12,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,48 +31,63 @@ public class FolderController {
     @GetMapping("/")
     public List<Path> getAll() {
 
+        System.out.println("defautl url: " + this.name);
         File[] directories = new File(this.name).listFiles(File::isDirectory);
 
-        List<File> files = Arrays.asList(directories);
-        List<Path> fileList = new ArrayList<>();
-        for(File f : files) {
-            Path path = new Path();
-            path.setUrl(f.getAbsolutePath());
-            fileList.add(path);
+        if (directories !=null) {
+            List<File> files = Arrays.asList(directories);
+            List<Path> fileList = new ArrayList<>();
+            for (File f : files) {
+                Path path = new Path();
+                path.setUrl(f.getAbsolutePath());
+                fileList.add(path);
+            }
+            System.out.println(files);
+            return fileList;
         }
-        System.out.println(files);
-        return fileList;
+
+        return null;
     }
 
     @GetMapping("/map")
     ResponseEntity<String> getAllOM() throws JsonProcessingException {
+        System.out.println("defautl url: " + this.name);
         File[] directories = new File(this.name).listFiles(File::isDirectory);
 
-        List<File> files = Arrays.asList(directories);
-        List<Path> fileList = new ArrayList<>();
-        for(File f : files) {
-            Path path = new Path();
-            path.setUrl(f.getAbsolutePath());
-            fileList.add(path);
+        if (directories!=null) {
+            List<File> files = Arrays.asList(directories);
+            List<Path> fileList = new ArrayList<>();
+            for (File f : files) {
+                Path path = new Path();
+                path.setUrl(f.getAbsolutePath());
+                fileList.add(path);
+            }
+            System.out.println("object mapper: " + files);
+
+            HttpHeaders headers = new HttpHeaders();
+            headers.setContentType(MediaType.APPLICATION_JSON);
+
+            return new ResponseEntity<>(objectMapper.writeValueAsString(fileList), headers, HttpStatus.OK);
         }
-        System.out.println("object mapper: " + files);
-
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-
-        return new ResponseEntity<>(objectMapper.writeValueAsString(fileList), headers,  HttpStatus.OK);
+        return new ResponseEntity<>(objectMapper.writeValueAsString("Unable to process"), HttpStatus.BAD_REQUEST);
     }
 
     @PostMapping("/createDir")
     public ResponseEntity<String> createPath(@RequestBody Path path) {
-        System.out.println(path.getUrl());
-        File[] directories = new File(path.getUrl()).listFiles(File::isDirectory);
-        if (directories!=null) {
-            this.name = path.getUrl();
-            return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
-        } else {
-            return new ResponseEntity<>("unable to process", HttpStatus.BAD_REQUEST);
+        System.out.println("from UI: " + path.getUrl());
+        try {
+            File[] directories = new File(path.getUrl()).listFiles(File::isDirectory);
+            if (directories != null) {
+                this.name = path.getUrl();
+                System.out.println("Requested path: " + this.name);
+                return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
+            }
+        } catch (NullPointerException ex) {
+            System.out.println(ex.getMessage());
         }
+
+        return new ResponseEntity<>("unable to process", HttpStatus.BAD_REQUEST);
+
     }
 
     @GetMapping("/all")

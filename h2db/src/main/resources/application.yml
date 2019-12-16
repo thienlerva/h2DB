@@ -1,7 +1,7 @@
 #server:
 #  port: 9090
 
-path.name: /usr
+path.name: /
 
 spring:
   application:
