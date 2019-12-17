@@ -29,21 +29,21 @@ public class FolderController {
     ObjectMapper objectMapper;
 
     @GetMapping("/")
-    public List<Path> getAll() {
+    public List<String> getAll() {
 
         System.out.println("defautl url: " + this.name);
         File[] directories = new File(this.name).listFiles(File::isDirectory);
+        List<String> directoryList = new ArrayList<>();
 
         if (directories !=null) {
             List<File> files = Arrays.asList(directories);
             List<Path> fileList = new ArrayList<>();
             for (File f : files) {
-                Path path = new Path();
-                path.setUrl(f.getAbsolutePath());
-                fileList.add(path);
+
+                directoryList.add(f.getAbsolutePath());
             }
             System.out.println(files);
-            return fileList;
+            return directoryList;
         }
 
         return null;
@@ -74,12 +74,21 @@ public class FolderController {
 
     @PostMapping("/createDir")
     public ResponseEntity<String> createPath(@RequestBody Path path) {
-        System.out.println("from UI: " + path.getUrl());
+        System.out.println("from UI: " + path);
+
+        String url;
+
+        if (path.getUrl()==null) {
+            url = "/";
+        } else {
+            url = path.getUrl();
+        }
+
         try {
-            File[] directories = new File(path.getUrl()).listFiles(File::isDirectory);
+            File[] directories = new File(url).listFiles(File::isDirectory);
             if (directories != null) {
-                this.name = path.getUrl();
-                System.out.println("Requested path: " + this.name);
+                this.name = url;
+                System.out.println("Updated default path: " + this.name);
                 return new ResponseEntity<>("Success", HttpStatus.ACCEPTED);
             }
         } catch (NullPointerException ex) {
