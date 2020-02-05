@@ -9,6 +9,7 @@ import org.springframework.http.*;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.client.RestTemplate;
 
+import javax.servlet.http.HttpSession;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -26,6 +27,26 @@ public class StudentController {
 
     @Autowired
     RestTemplate restTemplate;
+
+    @GetMapping("/cookie")
+    public String readCookie(@CookieValue(value = "username", defaultValue = "Atta") String username) {
+        return "My name is: " + username;
+    }
+
+    @PostMapping("/save")
+    public Student createStudent(HttpSession session, @RequestBody Student student) {
+        session.setAttribute("student", student);
+
+        return repo.save(student);
+    }
+
+    @GetMapping("/session")
+    public String handler(HttpSession session) {
+        String key = "student";
+        //session.setAttribute(key, "/usr/ncte/external");
+
+        return "session id: " + session.getId() + ", directory: " + session.getAttribute(key);
+    }
 
     @GetMapping("/students")
     public List<Student> findAllStudent() {
@@ -57,7 +78,8 @@ public class StudentController {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
 
-        ResponseEntity<Student> response = restTemplate.exchange("localhost:8080/student/all", HttpMethod.GET, new HttpEntity<>(headers), Student.class);
+        ResponseEntity<Student> response = restTemplate.exchange("localhost:8080/student/all",
+                HttpMethod.GET, new HttpEntity<>(headers), Student.class);
 
         return response;
     }
